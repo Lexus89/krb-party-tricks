@@ -10,8 +10,8 @@ import struct
 from collections import namedtuple
 from struct import pack, unpack
 
-from krb5 import encode, Ticket, NT_PRINCIPAL
-from util import gt2epoch, bitstring2int
+from .krb5 import encode, Ticket, NT_PRINCIPAL
+from .util import gt2epoch, bitstring2int
 
 CCacheCredential = namedtuple('CCacheCredential',
                               'client server key time is_skey tktflags addrs authdata ticket second_ticket')
@@ -22,7 +22,7 @@ CCacheAuthdata = namedtuple('CCacheAuthdata', 'authtype authdata')
 CCachePrincipal = namedtuple('CCachePrincipal', 'name_type realm components')
 
 VERSION = 0x0504
-DEFAULT_HEADER = '00010008ffffffff00000000'.decode('hex')
+DEFAULT_HEADER = '00010008ffffffff00000000'
 
 
 class CCache(object):
