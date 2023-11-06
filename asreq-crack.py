@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 # Author
 # ------
@@ -47,20 +47,20 @@ def crack(user_key, wordlist, plaintext_password):
         sys.stderr.write(' Done!\n')
         sys.stderr.write('  [+] Cracked with password(RC4) %s(%s)\n' % (plaintext_password,binascii.b2a_hex(user_key[1])))
     except Exception as e:
-        print ' ERROR:', e
+        print(' ERROR:', e)
 
 if __name__ == '__main__':
     from getopt import getopt
     from getpass import getpass
 
     def usage_and_exit():
-        print >> sys.stderr, 'USAGE:'
-        print >> sys.stderr, '%s' % sys.argv[0]
-        print >> sys.stderr, ''
-        print >> sys.stderr, 'OPTIONS:'
-        print >> sys.stderr, '    -w <dictionary file>'
-        print >> sys.stderr, '    -p <clearPassword>'
-        print >> sys.stderr, ' --rc4 <ntlmHash>'
+        print('USAGE:', file=sys.stderr)
+        print('%s' % sys.argv[0], file=sys.stderr)
+        print('', file=sys.stderr)
+        print('OPTIONS:', file=sys.stderr)
+        print('    -w <dictionary file>', file=sys.stderr)
+        print('    -p <clearPassword>', file=sys.stderr)
+        print(' --rc4 <ntlmHash>', file=sys.stderr)
         sys.exit(1)
 
     opts, args = getopt(sys.argv[1:], 'w:p:', ['rc4='])
