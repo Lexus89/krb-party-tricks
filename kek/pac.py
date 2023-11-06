@@ -8,8 +8,8 @@
 
 from struct import pack, unpack, unpack_from
 
-from crypto import checksum, RSA_MD5
-from util import filetime2local, epoch2filetime
+from .crypto import checksum, RSA_MD5
+from .util import filetime2local, epoch2filetime
 
 PAC_LOGON_INFO = 1
 PAC_SERVER_CHECKSUM = 6
@@ -208,10 +208,10 @@ def pretty_print_pac(pac):
             k2 += 12
             s = pac[k2:k2+le].decode('utf-16le')
             k2 += le
-            print '%s[0x%08x] %s' % (prefix, ptr, s)
+            print('%s[0x%08x] %s' % (prefix, ptr, s))
             k2 = (k2 + 3) / 4 * 4
         else:
-            print prefix + '<NULL>'
+            print(prefix + '<NULL>')
         return k, k2
 
     def ppgrparr(prefix, pac, k, k2):
@@ -220,12 +220,12 @@ def pretty_print_pac(pac):
         if ptr != 0:
             le = unpack_from('I', pac, k2)[0]
             k2 += 4
-            print '%s[0x%08x]' % (prefix, ptr)
+            print('%s[0x%08x]' % (prefix, ptr))
             for i in range(le):
-                print '        %d (Attributes: 0x%08x)' % unpack_from('II', pac, k2)
+                print('        %d (Attributes: 0x%08x)' % unpack_from('II', pac, k2))
                 k2 +=  8
         else:
-            print prefix + '<NULL>'
+            print(prefix + '<NULL>')
         return k, k2
 
     def ppsid(prefix, pac, k, k2):
@@ -239,58 +239,58 @@ def pretty_print_pac(pac):
             ia = (ia1 << 16) | ia2
             sa = unpack_from('I' * sac, pac, k2)
             k2 += 4 * sac
-            print '%s[0x%08x] S-%d-%d-%s' % (prefix, ptr, rev, ia, '-'.join(str(c) for c in sa))
+            print('%s[0x%08x] S-%d-%d-%s' % (prefix, ptr, rev, ia, '-'.join(str(c) for c in sa)))
         else:
-            print prefix + '<NULL>'
+            print(prefix + '<NULL>')
 
         return k, k2
 
     i = 0
-    print 'PACTYPE:'
+    print('PACTYPE:')
     cbuffers = unpack_from('I', pac, i)[0]
     i += 4
-    print '  cBuffers: %d' % cbuffers
-    print '  Version: %d' % unpack_from('I', pac, i)
+    print('  cBuffers: %d' % cbuffers)
+    print('  Version: %d' % unpack_from('I', pac, i))
     i += 4
     bufs = []
     for j in range(cbuffers):
         ultype, bufsz, offset = unpack_from('IIQ', pac, i)
         i += 16
-        print '  Buffers[%d]:' % j
-        print '    ulType: %d (%s)' % (
-            ultype, PAC_TYPE_NAME.get(ultype, 'UNKNOWN'))
-        print '    cbBufferSize: %d' % bufsz
-        print '    Offset: %d' % offset
+        print('  Buffers[%d]:' % j)
+        print('    ulType: %d (%s)' % (
+            ultype, PAC_TYPE_NAME.get(ultype, 'UNKNOWN')))
+        print('    cbBufferSize: %d' % bufsz)
+        print('    Offset: %d' % offset)
 
         if ultype == PAC_LOGON_INFO:
             k = offset
             k2 = offset + 236
-            print '      RPCHeader:'
-            print '        Version: %d' % unpack_from('B', pac, k)
+            print('      RPCHeader:')
+            print('        Version: %d' % unpack_from('B', pac, k))
             k += 1
-            print '        Endianness: %d' % unpack_from('B', pac, k)
+            print('        Endianness: %d' % unpack_from('B', pac, k))
             k += 1
-            print '        CommonHeaderLength: %d' % unpack_from('H', pac, k)
+            print('        CommonHeaderLength: %d' % unpack_from('H', pac, k))
             k += 2
-            print '        Filler: 0x%08x' % unpack_from('I', pac, k)
+            print('        Filler: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '        ObjectBufferLength: %d' % unpack_from('I', pac, k)
+            print('        ObjectBufferLength: %d' % unpack_from('I', pac, k))
             k += 4
-            print '        Filler: 0x%08x' % unpack_from('I', pac, k)
+            print('        Filler: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '        ElementId: 0x%08x' % unpack_from('I', pac, k)
+            print('        ElementId: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '      LogonTime: %s' % filetime2local(pac[k:k+8]) 
+            print('      LogonTime: %s' % filetime2local(pac[k:k+8])) 
             k += 8
-            print '      LogoffTime: %s' % filetime2local(pac[k:k+8])
+            print('      LogoffTime: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      KickOffTime: %s' % filetime2local(pac[k:k+8])
+            print('      KickOffTime: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      PasswordLastSet: %s' % filetime2local(pac[k:k+8])
+            print('      PasswordLastSet: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      PasswordCanChange: %s' % filetime2local(pac[k:k+8])
+            print('      PasswordCanChange: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      PasswordMustChange: %s' % filetime2local(pac[k:k+8])
+            print('      PasswordMustChange: %s' % filetime2local(pac[k:k+8]))
             k += 8
             k, k2 = ppstr('      EffectiveName: ', pac, k, k2)
             k, k2 = ppstr('      FullName: ', pac, k, k2)
@@ -298,55 +298,55 @@ def pretty_print_pac(pac):
             k, k2 = ppstr('      ProfilePath: ', pac, k, k2)
             k, k2 = ppstr('      HomeDirectory: ', pac, k, k2)
             k, k2 = ppstr('      HomeDirectoryDrive: ', pac, k, k2)
-            print '      LogonCount: %d' % unpack_from('H', pac, k)
+            print('      LogonCount: %d' % unpack_from('H', pac, k))
             k += 2
-            print '      BadPasswordCount: %d' % unpack_from('H', pac, k)
+            print('      BadPasswordCount: %d' % unpack_from('H', pac, k))
             k += 2
-            print '      UserId: %d' % unpack_from('I', pac, k)
+            print('      UserId: %d' % unpack_from('I', pac, k))
             k += 4
-            print '      PrimaryGroupId: %d' % unpack_from('I', pac, k)
+            print('      PrimaryGroupId: %d' % unpack_from('I', pac, k))
             k += 4
-            print '      GroupCount: %d' % unpack_from('I', pac, k)
+            print('      GroupCount: %d' % unpack_from('I', pac, k))
             k += 4
             k, k2 = ppgrparr('      GroupId: ', pac , k, k2)
-            print '      UserFlags: 0x%08x' % unpack_from('I', pac, k)
+            print('      UserFlags: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '      UserSessionKey: 0x%016x 0x%016x' % unpack_from('QQ', pac, k)
+            print('      UserSessionKey: 0x%016x 0x%016x' % unpack_from('QQ', pac, k))
             k += 16
             k, k2 = ppstr('      LogonServer: ', pac, k, k2)
             k, k2 = ppstr('      LogonDomainName: ', pac, k, k2)
             k, k2 = ppsid('      LogonDomainId: ', pac, k, k2)
-            print '      Reserved1: %s' % filetime2local(pac[k:k+8])
+            print('      Reserved1: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      UserAccountControl: 0x%08x' % unpack_from('I', pac, k)
+            print('      UserAccountControl: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '      SubAuthStatus: 0x%08x' % unpack_from('I', pac, k)
+            print('      SubAuthStatus: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '      LastSuccessfulILogon: %s' % filetime2local(pac[k:k+8])
+            print('      LastSuccessfulILogon: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      LastFailedILogon: %s' % filetime2local(pac[k:k+8])
+            print('      LastFailedILogon: %s' % filetime2local(pac[k:k+8]))
             k += 8
-            print '      FailedILogonCount: %d' % unpack_from('I', pac, k)
+            print('      FailedILogonCount: %d' % unpack_from('I', pac, k))
             k += 4
-            print '      Reserved3: 0x%08x' % unpack_from('I', pac, k)
+            print('      Reserved3: 0x%08x' % unpack_from('I', pac, k))
             k += 4
-            print '      SidCount: %d' % unpack_from('I', pac, k)
+            print('      SidCount: %d' % unpack_from('I', pac, k))
             k += 4
-            print '      ExtraSids: 0x%08x' % unpack_from('I', pac, k)
+            print('      ExtraSids: 0x%08x' % unpack_from('I', pac, k))
             k += 4
             k, k2 = ppsid('      ResourceGroupDomainSid: ', pac, k, k2)
-            print '      ResourceGroupCount: %d' % unpack_from('I', pac, k)
+            print('      ResourceGroupCount: %d' % unpack_from('I', pac, k))
             k += 4
             k, k2 = ppgrparr('      ResourceGroupIds: ', pac , k, k2)
 
         elif ultype == PAC_CLIENT_INFO:
             k = offset
-            print '      ClientId: %s' % filetime2local(pac[k:k+8])
+            print('      ClientId: %s' % filetime2local(pac[k:k+8]))
             k += 8
             name_len = unpack_from('H', pac, k)[0]
             k += 2
-            print '      Name: %s' % pac[k:k + name_len].decode('utf-16le')
+            print('      Name: %s' % pac[k:k + name_len].decode('utf-16le'))
 
         elif ultype in (PAC_SERVER_CHECKSUM, PAC_PRIVSVR_CHECKSUM):
-            print '     SignatureType: 0x%08x' % unpack_from('I', pac, offset)
-            print '     Signature: %s' % pac[offset+4:offset+bufsz].encode('hex')
+            print('     SignatureType: 0x%08x' % unpack_from('I', pac, offset))
+            print('     Signature: %s' % pac[offset+4:offset+bufsz].encode('hex'))
