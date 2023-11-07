@@ -13,7 +13,7 @@ try:
     from Crypto.Cipher import ARC4
     from Crypto.Hash import HMAC, MD5, MD4
 except ImportError:
-    from _crypto import ARC4, MD5, MD4
+    from ._crypto import ARC4, MD5, MD4
     import hmac as HMAC
 
 import binascii
@@ -26,7 +26,7 @@ RSA_MD5 = 7
 HMAC_MD5 = 0xFFFFFF76
 
 def random_bytes(n):
-    return ''.join(chr(c) for c in sample(xrange(256), n))
+    return ''.join(chr(c) for c in sample(range(256), n))
 
 def decrypt(etype, key, msg_type, encrypted):
     if etype != RC4_HMAC:

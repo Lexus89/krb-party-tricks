@@ -6,14 +6,15 @@
 # Contact : sylvain dot monne at solucom dot fr
 # http://twitter.com/bidord
 
-from collections import namedtuple
 import struct
+from collections import namedtuple
 from struct import pack, unpack
 
-from util import gt2epoch, bitstring2int
-from krb5 import encode, Ticket, NT_PRINCIPAL
+from .krb5 import encode, Ticket, NT_PRINCIPAL
+from .util import gt2epoch, bitstring2int
 
-CCacheCredential = namedtuple('CCacheCredential', 'client server key time is_skey tktflags addrs authdata ticket second_ticket')
+CCacheCredential = namedtuple('CCacheCredential',
+                              'client server key time is_skey tktflags addrs authdata ticket second_ticket')
 CCacheKeyblock = namedtuple('CCacheKeyblock', 'keytype etype keyvalue')
 CCacheTimes = namedtuple('CCacheTimes', 'authtime starttime endtime renew_till')
 CCacheAddress = namedtuple('CCacheAddress', 'addrtype addrdata')
@@ -21,12 +22,13 @@ CCacheAuthdata = namedtuple('CCacheAuthdata', 'authtype authdata')
 CCachePrincipal = namedtuple('CCachePrincipal', 'name_type realm components')
 
 VERSION = 0x0504
-DEFAULT_HEADER = '00010008ffffffff00000000'.decode('hex')
+DEFAULT_HEADER = '00010008ffffffff00000000'
+
 
 class CCache(object):
     def __init__(self, primary_principal, credentials=[], header=DEFAULT_HEADER):
         if not isinstance(primary_principal, CCachePrincipal):
-            if isinstance(primary_principal, basestring) and '@' in primary_principal:
+            if isinstance(primary_principal, str) and '@' in primary_principal:
                 realm, user_name = primary_principal.split('@', 1)
             elif isinstance(primary_principal, tuple) and len(primary_principal) == 2:
                 realm, user_name = primary_principal
@@ -88,7 +90,7 @@ class CCache(object):
         realm = cls.read_string(fp)
         components = [cls.read_string(fp) for i in range(num_components)]
         return CCachePrincipal(name_type, realm, components)
-    
+
     @classmethod
     def write_principal(cls, fp, p):
         fp.write(pack('>II', p.name_type, len(p.components)))
@@ -157,11 +159,13 @@ class CCache(object):
         cls.write_string(fp, c.ticket)
         cls.write_string(fp, c.second_ticket)
 
+
 def get_tgt_cred(ccache):
     for credential in ccache.credentials:
         if credential.server.components[0] == 'krbtgt':
             return credential
     raise ValueError('No TGT in CCache!')
+
 
 def kdc_rep2ccache(kdc_rep, kdc_rep_enc):
     return CCacheCredential(

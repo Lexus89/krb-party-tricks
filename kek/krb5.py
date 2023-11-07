@@ -16,8 +16,8 @@ from pyasn1.type.namedtype import NamedTypes, NamedType, OptionalNamedType
 from pyasn1.codec.der.encoder import encode
 from pyasn1.codec.der.decoder import decode
 
-from crypto import encrypt, decrypt, checksum, RC4_HMAC, RSA_MD5
-from util import epoch2gt
+from .crypto import encrypt, decrypt, checksum, RC4_HMAC, RSA_MD5
+from .util import epoch2gt
 from struct import pack, unpack
 
 NT_UNKNOWN = 0
